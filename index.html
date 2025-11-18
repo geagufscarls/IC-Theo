@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Pragas</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding-top: 60px;
+        }
+
+        header {
+            width: 100%;
+            height: 60px;
+            background-color: #003399;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        .main-content {
+            margin-top: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .app-container {
+            max-width: 400px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #003399;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0055cc;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .visualizacao-dados {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #003399;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Registro de Pragas</h1>
+    </header>
+
+    <div class="main-content">
+        <div class="app-container">
+            <form id="pragaForm">
+                <div class="form-group">
+                    <label for="nomePragueiro">Nome do Pragueiro:</label>
+                    <input type="text" id="nomePragueiro" placeholder="Digite seu nome">
+                </div>
+                <div class="form-group">
+                    <label for="talhao">Talhão:</label>
+                    <select id="talhao">
+                        <option value="P3">P3</option>
+                        <option value="S2">S2</option>
+                        <option value="S4-1">S4-1</option>
+                        <option value="S4-2">S4-2</option>
+                        <option value="P1-B">P1-B</option>
+                        <option value="P1-A">P1-A</option>
+                        <option value="S5">S5</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="cultura">Cultura:</label>
+                    <select id="cultura">
+                        <option value="soja">Soja</option>
+                        <option value="milho">Milho</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="estagio">Estágio da cultura</label>
+                    <input type="text" id="estagio" placeholder="Digite o estágio">
+                </div>
+                <div class="form-group">
+                    <label for="tecnica">Técnica utilizada:</label>
+                    <select id="tecnica">
+                        <option value="bandeja">Bandeja</option>
+                        <option value="panobatido">Pano de Batida</option>
+                        <option value="contagem">Contagem direta</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="numeroPlanta">Número da Planta:</label>
+                    <div class="button-group">
+                        <button type="button" id="plantaAnterior">Anterior</button>
+                        <input type="number" id="numeroPlanta" value="1" readonly>
+                        <button type="button" id="plantaSeguinte">Seguinte</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="nomePraga">Praga:</label>
+                    <select id="nomePraga">
+                    <option value="NHP">NHP-Nenhuma praga registrada</option>
+                        <optgroup label="Cigarrinhas">
+                            <option value="CIG">CIG-Cigarrinha</option>
+                            <option value="NFCIG">NFCIG-Ninfa cigarrinha</option>
+                             <option value="VBDA">VBDA-vaquinha-brasileirinha-Diabrotica amabilis</option> 
+                        </optgroup>
+                
+                        <!-- Grupo: Sugadores -->
+                        <optgroup label="Sugadores">
+                            <option value="TRI">TRIP-Tripes fitófago</option>
+                            <option value="PER">PER-Percevejo desconhcido</option>
+                            <option value="PERM">PERM-Euschistus heros</option>
+                            <option value="PERV">PERV-Nezara viridula</option>
+                            <option value="PERAP">PERAP-Edessa meditabunda</option>
+                            <option value="PG">PG-Pulgão</option>
+                            <option value="PGA">PGA-Pulgão alado</option>
+                            <option value="CIG">CIG-cigarrinha-do-milho</option>
+                            <option value="MA">MA-Mosca-branca</option>
+                            <option value="NFMB">NFMB-Ninfa mosca-branca</option>
+                            <option value="MBA">AMB-Adulto mosca-branca</option>
+                        </optgroup>
+              
+                        <optgroup label="Predadores e Parasitóides">
+                            <option value="BLL">Larva Bicho-lixeiro</option>
+                            <option value="BLA">Adulto Bicho-lixeiro</option>
+                            <option value="OBL">Ovo bicho-lixeiro</option> 
+                            <option value="JOA">JOA-Joaninha</option>
+                            <option value="CYC">JOC-Joaninha cycloneda</option>
+                           <option value="ERIO">ERIO-Joaninha Eriopis</option>
+                        </optgroup>
+                        
+                        <optgroup label="Desfolhadores">
+                            <option value="LG">LGG-Lagarta desconhecida</option>
+                            <option value="ANTC">ANTC-Anticarsia gemmatalis</option>
+                            <option value="HEL">HEL-lagarta helicoverpa</option>
+                           <option value="FAL">FAL-Falsa medideira</option>
+                             <option value="PLU">PLU-Plutella xyllostella</option>
+                             <option value="SPO">SPOD-Spodoptera spp.</option>
+                        </optgroup>
+                          <optgroup label="Massa de Ovos">
+                            <option value="Ovosparasitados">Massa de ovos parasitados(percevejo)</option>
+                           <option value="massaovos">Massa de ovos(percevejo)</option>                          
+                           
+                        </optgroup>
+                        <optgroup label="Desfolhadores">
+                            <option value="Desfolha F(%)">Desfolha F(%)-Formiga</option>
+                            <option value="Desfolha G(%)">Desfolha G(%)-Gafanhoto</option>
+                            <option value="Desfolha L(%)">Desfolha L(%)-Lagarta</option>
+                            <option value="Desfolha V(%)">Desfolha V(%)-Vaquinha</option>
+                        </optgroup>
+                
+                            <option value="Outro">Outro</option>
+                        
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantidade">Quantidade:</label>
+                    <input type="number" id="quantidade" placeholder="Digite a quantidade">
+                </div>
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <textarea id="observacoes" placeholder="Detalhes sobre a planta ou praga"></textarea>
+                </div>
+                <button type="button" id="adicionarPraga">Adicionar Praga</button>
+            </form>
+            <button id="baixarExcel">Baixar Excel</button>
+        </div>
+        <div class="visualizacao-dados">
+            <h2>Dados Registrados</h2>
+            <table>
+                 <thead>
+                    <tr>
+                        <th>Talhão</th>
+                        <th>Cultura</th>
+                        <th>Planta</th>
+                        <th>Pragueiro</th>
+                        <th>Estágio</th>
+                        <th>Técnica</th>
+                        <th>Praga</th>
+                        <th>Quantidade</th>
+                        <th>Observações</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabelaDados"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const numeroPlantaInput = document.getElementById('numeroPlanta');
+    const plantaAnteriorBtn = document.getElementById('plantaAnterior');
+    const plantaSeguinteBtn = document.getElementById('plantaSeguinte');
+    const adicionarPragaBtn = document.getElementById('adicionarPraga');
+    const tabelaDados = document.getElementById('tabelaDados');
+    const baixarExcelBtn = document.getElementById('baixarExcel');
+
+    let numeroPlanta = 1;
+    let dadosPragas = [];
+
+    plantaAnteriorBtn.addEventListener('click', () => {
+        if (numeroPlanta > 1) {
+            numeroPlanta--;
+            numeroPlantaInput.value = numeroPlanta;
+        }
+    });
+
+    plantaSeguinteBtn.addEventListener('click', () => {
+        numeroPlanta++;
+        numeroPlantaInput.value = numeroPlanta;
+    });
+
+    adicionarPragaBtn.addEventListener('click', () => {
+        const talhao = document.getElementById('talhao').value;
+        const cultura = document.getElementById('cultura').value;
+        const pragueiro = document.getElementById('nomePragueiro').value;
+        const estagio = document.getElementById('estagio').value;
+        const tecnica = document.getElementById('tecnica').value;
+        const nomePraga = document.getElementById('nomePraga').value;
+        const quantidade = document.getElementById('quantidade').value;
+        const observacoes = document.getElementById('observacoes').value;
+
+        if (!pragueiro || !cultura || !quantidade || !tecnica || !estagio || isNaN(quantidade) || quantidade <= 0) {
+            alert('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+
+        // Capturar coordenadas do usuário
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const latitude = position.coords.latitude.toFixed(6);
+                const longitude = position.coords.longitude.toFixed(6);
+
+                const registro = {
+                    Pragueiro: pragueiro,
+                    Talhao: talhao,
+                    Cultura: cultura,
+                    Planta: numeroPlanta,
+                    Estagio: estagio,
+                    Tecnica: tecnica,
+                    Praga: nomePraga,
+                    Quantidade: quantidade,
+                    Observacoes: observacoes,
+                    Latitude: latitude,
+                    Longitude: longitude
+                };
+
+                dadosPragas.push(registro);
+                salvarDados();
+                atualizarTabela();
+            }, error => {
+                alert("Erro ao obter localização: " + error.message);
+            });
+        } else {
+            alert("Geolocalização não suportada no navegador.");
+        }
+    });
+
+    function atualizarTabela() {
+        tabelaDados.innerHTML = '';
+        dadosPragas.forEach((registro, index) => {
+            const row = document.createElement('tr');
+
+            Object.values(registro).forEach(value => {
+                const cell = document.createElement('td');
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const actionsCell = document.createElement('td');
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Excluir';
+            deleteBtn.addEventListener('click', () => {
+                dadosPragas.splice(index, 1);
+                salvarDados();
+                atualizarTabela();
+            });
+            actionsCell.appendChild(deleteBtn);
+            row.appendChild(actionsCell);
+
+            tabelaDados.appendChild(row);
+        });
+    }
+
+    function salvarDados() {
+        localStorage.setItem('dadosPragas', JSON.stringify(dadosPragas));
+    }
+
+    function carregarDados() {
+        const dadosSalvos = localStorage.getItem('dadosPragas');
+        if (dadosSalvos) {
+            dadosPragas = JSON.parse(dadosSalvos);
+            atualizarTabela();
+        }
+    }
+
+    baixarExcelBtn.addEventListener('click', () => {
+        if (dadosPragas.length === 0) {
+            alert('Não há dados para exportar.');
+            return;
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(dadosPragas);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Pragas');
+
+        XLSX.writeFile(workbook, 'dados_pragas.xlsx');
+    });
+
+    carregarDados();
+    async function registrarDados(dados) {
+    try {
+        const response = await fetch("http://127.0.0.1:5000", { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dados),
+        });
+
+        if (response.ok) {
+            console.log("Dados registrados com sucesso!");
+        } else {
+            console.error("Erro ao registrar dados.");
+        }
+    } catch (error) {
+        console.error("Falha na conexão com o backend:", error);
+    }
+}
+
+});
+
+   </script>
+</body>
+</html>
