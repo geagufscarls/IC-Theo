@@ -1,10 +1,10 @@
 const CACHE_NAME = "pragas-offline-v1";
 
 const FILES_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/service-worker.js",
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./service-worker.js",
   "https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"
 ];
 
@@ -23,3 +23,4 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
