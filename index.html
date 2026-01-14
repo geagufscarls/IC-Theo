@@ -293,34 +293,45 @@
         }
 
         // Capturar coordenadas do usuário
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(position => {
-                const latitude = position.coords.latitude.toFixed(6);
-                const longitude = position.coords.longitude.toFixed(6);
+      if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+        position => {
+            const latitude = position.coords.latitude.toFixed(6);
+            const longitude = position.coords.longitude.toFixed(6);
+            const precisao = position.coords.accuracy; // metros
 
-                const registro = {
-                    Pragueiro: pragueiro,
-                    Talhao: talhao,
-                    Cultura: cultura,
-                    Planta: numeroPlanta,
-                    Estagio: estagio,
-                    Tecnica: tecnica,
-                    Praga: nomePraga,
-                    Quantidade: quantidade,
-                    Observacoes: observacoes,
-                    Latitude: latitude,
-                    Longitude: longitude
-                };
+            const registro = {
+                Pragueiro: pragueiro,
+                Talhao: talhao,
+                Cultura: cultura,
+                Planta: numeroPlanta,
+                Estagio: estagio,
+                Tecnica: tecnica,
+                Praga: nomePraga,
+                Quantidade: quantidade,
+                Observacoes: observacoes,
+                Latitude: latitude,
+                Longitude: longitude,
+                Precisao_m: precisao
+            };
 
-                dadosPragas.push(registro);
-                salvarDados();
-                atualizarTabela();
-            }, error => {
-                alert("Erro ao obter localização: " + error.message);
-            });
-        } else {
-            alert("Geolocalização não suportada no navegador.");
+            dadosPragas.push(registro);
+            salvarDados();
+            atualizarTabela();
+        },
+        error => {
+            alert("Erro ao obter localização: " + error.message);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
         }
+    );
+} else {
+    alert("Geolocalização não suportada no navegador.");
+}
+
     });
 
     function atualizarTabela() {
@@ -392,10 +403,18 @@
         console.error("Falha na conexão com o backend:", error);
     }
 }
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registrado:', reg.scope))
+        .catch(err => console.error('Erro no Service Worker:', err));
+    });
+}
 
 });
 
    </script>
 </body>
 </html>
+
 
