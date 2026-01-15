@@ -252,9 +252,11 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    <script src="./xlsx.full.min.js"></script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
     const numeroPlantaInput = document.getElementById('numeroPlanta');
     const plantaAnteriorBtn = document.getElementById('plantaAnterior');
     const plantaSeguinteBtn = document.getElementById('plantaSeguinte');
@@ -265,6 +267,9 @@
     let numeroPlanta = 1;
     let dadosPragas = [];
 
+    /* ===============================
+       CONTROLE DE PLANTAS
+    =============================== */
     plantaAnteriorBtn.addEventListener('click', () => {
         if (numeroPlanta > 1) {
             numeroPlanta--;
@@ -277,89 +282,97 @@
         numeroPlantaInput.value = numeroPlanta;
     });
 
+    /* ===============================
+       ADICIONAR REGISTRO
+    =============================== */
     adicionarPragaBtn.addEventListener('click', () => {
+
         const talhao = document.getElementById('talhao').value;
         const cultura = document.getElementById('cultura').value;
-        const pragueiro = document.getElementById('nomePragueiro').value;
-        const estagio = document.getElementById('estagio').value;
+        const pragueiro = document.getElementById('nomePragueiro').value.trim();
+        const estagio = document.getElementById('estagio').value.trim();
         const tecnica = document.getElementById('tecnica').value;
         const nomePraga = document.getElementById('nomePraga').value;
-        const quantidade = document.getElementById('quantidade').value;
-        const observacoes = document.getElementById('observacoes').value;
+        const quantidade = Number(document.getElementById('quantidade').value);
+        const observacoes = document.getElementById('observacoes').value.trim();
 
-        if (!pragueiro || !cultura || !quantidade || !tecnica || !estagio || isNaN(quantidade) || quantidade <= 0) {
-            alert('Por favor, preencha todos os campos corretamente.');
+        if (!pragueiro || !estagio || !quantidade || quantidade <= 0) {
+            alert('Preencha todos os campos obrigatórios.');
             return;
         }
 
-        // Capturar coordenadas do usuário
-      if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-        position => {
-            const latitude = position.coords.latitude.toFixed(6);
-            const longitude = position.coords.longitude.toFixed(6);
-            const precisao = position.coords.accuracy; // metros
-
-            const registro = {
-                Pragueiro: pragueiro,
-                Talhao: talhao,
-                Cultura: cultura,
-                Planta: numeroPlanta,
-                Estagio: estagio,
-                Tecnica: tecnica,
-                Praga: nomePraga,
-                Quantidade: quantidade,
-                Observacoes: observacoes,
-                Latitude: latitude,
-                Longitude: longitude,
-                Precisao_m: precisao
-            };
-
-            dadosPragas.push(registro);
-            salvarDados();
-            atualizarTabela();
-        },
-        error => {
-            alert("Erro ao obter localização: " + error.message);
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0
+        if (!("geolocation" in navigator)) {
+            alert("Geolocalização não suportada.");
+            return;
         }
-    );
-} else {
-    alert("Geolocalização não suportada no navegador.");
-}
 
+        navigator.geolocation.getCurrentPosition(
+            position => {
+
+                const registro = {
+                    Pragueiro: pragueiro,
+                    Talhao: talhao,
+                    Cultura: cultura,
+                    Planta: numeroPlanta,
+                    Estagio: estagio,
+                    Tecnica: tecnica,
+                    Praga: nomePraga,
+                    Quantidade: quantidade,
+                    Observacoes: observacoes,
+                    Latitude: position.coords.latitude.toFixed(6),
+                    Longitude: position.coords.longitude.toFixed(6),
+                    Precisao_m: Math.round(position.coords.accuracy)
+                };
+
+                dadosPragas.push(registro);
+                salvarDados();
+                atualizarTabela();
+
+            },
+            error => {
+                alert("Erro ao obter localização: " + error.message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            }
+        );
     });
 
+    /* ===============================
+       ATUALIZAR TABELA
+    =============================== */
     function atualizarTabela() {
         tabelaDados.innerHTML = '';
+
         dadosPragas.forEach((registro, index) => {
             const row = document.createElement('tr');
 
-            Object.values(registro).forEach(value => {
+            Object.values(registro).forEach(valor => {
                 const cell = document.createElement('td');
-                cell.textContent = value;
+                cell.textContent = valor;
                 row.appendChild(cell);
             });
 
             const actionsCell = document.createElement('td');
             const deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Excluir';
-            deleteBtn.addEventListener('click', () => {
+            deleteBtn.onclick = () => {
                 dadosPragas.splice(index, 1);
                 salvarDados();
                 atualizarTabela();
-            });
+            };
+
             actionsCell.appendChild(deleteBtn);
             row.appendChild(actionsCell);
-
             tabelaDados.appendChild(row);
         });
     }
 
+    /* ===============================
+       LOCAL STORAGE
+    =============================== */
     function salvarDados() {
         localStorage.setItem('dadosPragas', JSON.stringify(dadosPragas));
     }
@@ -372,6 +385,9 @@
         }
     }
 
+    /* ===============================
+       EXPORTAR EXCEL OFFLINE
+    =============================== */
     baixarExcelBtn.addEventListener('click', () => {
         if (dadosPragas.length === 0) {
             alert('Não há dados para exportar.');
@@ -381,41 +397,26 @@
         const worksheet = XLSX.utils.json_to_sheet(dadosPragas);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Pragas');
-
         XLSX.writeFile(workbook, 'dados_pragas.xlsx');
     });
 
     carregarDados();
-    async function registrarDados(dados) {
-    try {
-        const response = await fetch("http://127.0.0.1:5000", { 
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dados),
-        });
 
-        if (response.ok) {
-            console.log("Dados registrados com sucesso!");
-        } else {
-            console.error("Erro ao registrar dados.");
-        }
-    } catch (error) {
-        console.error("Falha na conexão com o backend:", error);
-    }
-}
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    /* ===============================
+       SERVICE WORKER
+    =============================== */
+    if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Service Worker registrado:', reg.scope))
-        .catch(err => console.error('Erro no Service Worker:', err));
-    });
-}
+            .then(reg => console.log('Service Worker registrado:', reg.scope))
+            .catch(err => console.error('Erro no Service Worker:', err));
+    }
 
 });
+</script>
 
-   </script>
 </body>
 </html>
+
 
 
 
